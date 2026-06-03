@@ -20,7 +20,7 @@ const nav = [
   { to: '/vaccines', label: 'Vaccines', icon: Syringe },
 ]
 
-export default function Sidebar() {
+export default function Sidebar({ onNavigate }) {
   return (
     <aside className="w-60 flex-shrink-0 flex flex-col bg-navy h-full">
       {/* Logo */}
@@ -38,6 +38,7 @@ export default function Sidebar() {
             key={to}
             to={to}
             end={end}
+            onClick={onNavigate}
             className={({ isActive }) =>
               cn(
                 'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 group',
@@ -65,6 +66,7 @@ export default function Sidebar() {
       <div className="px-3 py-4 border-t border-white/10">
         <NavLink
           to="/settings"
+          onClick={onNavigate}
           className={({ isActive }) =>
             cn(
               'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 group',

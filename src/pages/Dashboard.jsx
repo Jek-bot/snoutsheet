@@ -114,9 +114,9 @@ export default function Dashboard() {
   }, [user])
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
+    <div className="max-w-6xl mx-auto space-y-4">
       {/* Stats */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 gap-3">
         <StatCard icon={Users} label="Total Clients" value={stats.clients} color="bg-navy-50 text-navy" to="/clients" />
         <StatCard icon={PawPrint} label="Total Pets" value={stats.pets} color="bg-teal-50 text-teal-600" to="/pets" />
         <StatCard icon={CalendarDays} label="Upcoming Bookings" value={stats.upcoming} color="bg-blue-50 text-blue-600" to="/bookings" />
@@ -124,7 +124,7 @@ export default function Dashboard() {
       </div>
 
       {/* Two-col content */}
-      <div className="grid lg:grid-cols-2 gap-4">
+      <div className="grid lg:grid-cols-2 gap-3">
         {/* Upcoming bookings */}
         <div className="card p-5">
           <div className="flex items-center justify-between mb-4">
