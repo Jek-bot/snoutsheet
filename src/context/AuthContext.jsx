@@ -24,10 +24,13 @@ export function AuthProvider({ children }) {
   const signIn = (email, password) =>
     supabase.auth.signInWithPassword({ email, password })
 
+  const signUp = (email, password) =>
+    supabase.auth.signUp({ email, password })
+
   const signOut = () => supabase.auth.signOut()
 
   return (
-    <AuthContext.Provider value={{ session, user, signIn, signOut, loading: session === undefined }}>
+    <AuthContext.Provider value={{ session, user, signIn, signUp, signOut, loading: session === undefined }}>
       {children}
     </AuthContext.Provider>
   )

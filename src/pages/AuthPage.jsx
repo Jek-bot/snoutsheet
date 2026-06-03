@@ -4,16 +4,50 @@ import { useAuth } from '@/context/AuthContext'
 import { cn } from '@/lib/utils'
 
 export default function AuthPage() {
-  const { signIn } = useAuth()
+  const { signIn, signUp } = useAuth()
+  const [mode, setMode] = useState('signin') // 'signin' | 'signup'
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [showPw, setShowPw] = useState(false)
   const [error, setError] = useState('')
+  const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
+
+  function switchMode(m) {
+    setMode(m)
+    setError('')
+    setSuccess('')
+    setPassword('')
+    setConfirmPassword('')
+  }
 
   async function handleSubmit(e) {
     e.preventDefault()
     setError('')
+    setSuccess('')
+
+    if (mode === 'signup') {
+      if (password.length < 8) {
+        setError('Password must be at least 8 characters.')
+        return
+      }
+      if (password !== confirmPassword) {
+        setError('Passwords do not match.')
+        return
+      }
+      setLoading(true)
+      const { error } = await signUp(email, password)
+      setLoading(false)
+      if (error) {
+        setError(error.message)
+      } else {
+        setSuccess('Account created! Check your email to confirm your address, then sign in.')
+        switchMode('signin')
+      }
+      return
+    }
+
     setLoading(true)
     const { error } = await signIn(email, password)
     if (error) setError(error.message)
@@ -66,8 +100,42 @@ export default function AuthPage() {
           </div>
 
           <div className="card p-8">
-            <h2 className="text-xl font-bold text-navy mb-1">Welcome back</h2>
-            <p className="text-sm text-navy-300 mb-6">Sign in to your account</p>
+            {/* Mode tabs */}
+            <div className="flex rounded-xl bg-surface border border-surface-border p-1 mb-6">
+              <button
+                type="button"
+                onClick={() => switchMode('signin')}
+                className={cn(
+                  'flex-1 py-1.5 text-sm font-semibold rounded-lg transition-all',
+                  mode === 'signin'
+                    ? 'bg-white text-navy shadow-card'
+                    : 'text-navy-300 hover:text-navy'
+                )}
+              >
+                Sign In
+              </button>
+              <button
+                type="button"
+                onClick={() => switchMode('signup')}
+                className={cn(
+                  'flex-1 py-1.5 text-sm font-semibold rounded-lg transition-all',
+                  mode === 'signup'
+                    ? 'bg-white text-navy shadow-card'
+                    : 'text-navy-300 hover:text-navy'
+                )}
+              >
+                Sign Up
+              </button>
+            </div>
+
+            <h2 className="text-xl font-bold text-navy mb-1">
+              {mode === 'signin' ? 'Welcome back' : 'Create your account'}
+            </h2>
+            <p className="text-sm text-navy-300 mb-6">
+              {mode === 'signin'
+                ? 'Sign in to your account'
+                : 'Set up your pet sitting workspace'}
+            </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
@@ -91,11 +159,11 @@ export default function AuthPage() {
                     id="password"
                     type={showPw ? 'text' : 'password'}
                     className="input pr-10"
-                    placeholder="••••••••"
+                    placeholder={mode === 'signup' ? 'At least 8 characters' : '••••••••'}
                     value={password}
                     onChange={e => setPassword(e.target.value)}
                     required
-                    autoComplete="current-password"
+                    autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
                   />
                   <button
                     type="button"
@@ -108,21 +176,42 @@ export default function AuthPage() {
                 </div>
               </div>
 
+              {mode === 'signup' && (
+                <div>
+                  <label className="label" htmlFor="confirm-password">Confirm Password</label>
+                  <input
+                    id="confirm-password"
+                    type={showPw ? 'text' : 'password'}
+                    className="input"
+                    placeholder="••••••••"
+                    value={confirmPassword}
+                    onChange={e => setConfirmPassword(e.target.value)}
+                    required
+                    autoComplete="new-password"
+                  />
+                </div>
+              )}
+
               {error && (
                 <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+              )}
+              {success && (
+                <p className="text-sm text-green-700 bg-green-50 rounded-lg px-3 py-2">{success}</p>
               )}
 
               <button
                 type="submit"
                 className={cn('btn-primary w-full py-2.5', loading && 'opacity-70 pointer-events-none')}
               >
-                {loading ? 'Signing in…' : 'Sign in'}
+                {loading
+                  ? (mode === 'signup' ? 'Creating account…' : 'Signing in…')
+                  : (mode === 'signup' ? 'Create Account' : 'Sign In')}
               </button>
             </form>
           </div>
 
           <p className="text-center text-xs text-navy-300 mt-4">
-            Single-user app — contact your administrator to reset your password.
+            Each account has its own private client and booking data.
           </p>
         </div>
       </div>
