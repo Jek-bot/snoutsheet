@@ -10,11 +10,13 @@ export function AuthProvider({ children }) {
 
   async function loadProfile(userId) {
     if (!userId) { setProfile(null); return }
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('user_profiles')
       .select('approved, is_admin')
       .eq('id', userId)
-      .single()
+      .maybeSingle()
+    if (error) console.error('Profile load error:', error)
+    if (!data) console.warn('No profile row found for', userId)
     setProfile(data ?? { approved: false, is_admin: false })
   }
 
