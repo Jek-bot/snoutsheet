@@ -4,18 +4,31 @@ import { supabase } from '@/lib/supabase'
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [session, setSession] = useState(undefined) // undefined = loading
+  const [session, setSession] = useState(undefined)
   const [user, setUser] = useState(null)
+  const [profile, setProfile] = useState(null)
+
+  async function loadProfile(userId) {
+    if (!userId) { setProfile(null); return }
+    const { data } = await supabase
+      .from('user_profiles')
+      .select('approved, is_admin')
+      .eq('id', userId)
+      .single()
+    setProfile(data ?? { approved: false, is_admin: false })
+  }
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       setUser(session?.user ?? null)
+      loadProfile(session?.user?.id ?? null)
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
       setUser(session?.user ?? null)
+      loadProfile(session?.user?.id ?? null)
     })
 
     return () => subscription.unsubscribe()
@@ -29,8 +42,16 @@ export function AuthProvider({ children }) {
 
   const signOut = () => supabase.auth.signOut()
 
+  const loading = session === undefined || (session !== null && profile === null)
+
   return (
-    <AuthContext.Provider value={{ session, user, signIn, signUp, signOut, loading: session === undefined }}>
+    <AuthContext.Provider value={{
+      session, user, profile,
+      signIn, signUp, signOut,
+      loading,
+      isApproved: profile?.approved ?? false,
+      isAdmin: profile?.is_admin ?? false,
+    }}>
       {children}
     </AuthContext.Provider>
   )

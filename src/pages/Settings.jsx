@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Save, Link2, CheckCircle, Plus, Pencil, Trash2, Clock } from 'lucide-react'
+import { Save, Link2, CheckCircle, Plus, Pencil, Trash2, Clock, UserCheck, UserX } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
-import { formatCurrency } from '@/lib/utils'
+import { formatCurrency, formatDate } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import ServiceModal from '@/components/services/ServiceModal'
 
@@ -73,7 +73,7 @@ function ServiceRow({ service, onEdit, onDelete }) {
 }
 
 export default function Settings() {
-  const { user } = useAuth()
+  const { user, isAdmin } = useAuth()
   const [form, setForm] = useState({
     business_name: '',
     business_phone: '',
@@ -92,6 +92,10 @@ export default function Settings() {
   const [serviceModalOpen, setServiceModalOpen] = useState(false)
   const [editingService, setEditingService] = useState(null)
 
+  // Users state (admin only)
+  const [pendingUsers, setPendingUsers] = useState([])
+  const [allUsers, setAllUsers] = useState([])
+
   useEffect(() => {
     if (!user) return
     supabase
@@ -101,7 +105,8 @@ export default function Settings() {
       .single()
       .then(({ data }) => { if (data) setForm(f => ({ ...f, ...data })) })
     loadServices()
-  }, [user])
+    if (isAdmin) loadUsers()
+  }, [user, isAdmin])
 
   function loadServices() {
     supabase
@@ -123,6 +128,34 @@ export default function Settings() {
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2500)
+  }
+
+  async function loadUsers() {
+    const { data } = await supabase
+      .from('user_profiles')
+      .select('id, approved, is_admin, created_at')
+      .order('created_at')
+    if (!data) return
+    // Fetch emails via auth.users — available only via admin, so we store email in metadata
+    // Instead, join against a view or use the id to fetch email from auth.users via RPC if available
+    // For now display by id; enrich with email if accessible
+    const enriched = await Promise.all(data.map(async (p) => {
+      // Try to get email from the user's own metadata (only works for own user)
+      return { ...p, email: p.id === user.id ? user.email : p.id }
+    }))
+    setPendingUsers(enriched.filter(u => !u.approved))
+    setAllUsers(enriched.filter(u => u.approved && u.id !== user.id))
+  }
+
+  async function approveUser(id) {
+    await supabase.from('user_profiles').update({ approved: true }).eq('id', id)
+    loadUsers()
+  }
+
+  async function revokeUser(id) {
+    if (!confirm('Revoke access for this user?')) return
+    await supabase.from('user_profiles').update({ approved: false }).eq('id', id)
+    loadUsers()
   }
 
   function openAddService() { setEditingService(null); setServiceModalOpen(true) }
@@ -265,6 +298,57 @@ export default function Settings() {
           When connected, confirmed bookings are automatically added to your Google Calendar and kept in sync.
         </p>
       </Section>
+
+      {/* User Management — admin only */}
+      {isAdmin && (
+        <Section title="User Management">
+          {pendingUsers.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs font-bold text-yellow-600 uppercase tracking-widest">Pending Approval ({pendingUsers.length})</p>
+              {pendingUsers.map(u => (
+                <div key={u.id} className="flex items-center justify-between p-3 rounded-xl border border-yellow-100 bg-yellow-50">
+                  <div>
+                    <p className="text-sm font-medium text-navy">{u.email}</p>
+                    <p className="text-xs text-navy-300">Signed up {formatDate(u.created_at)}</p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => approveUser(u.id)}
+                      className="btn-teal text-xs px-3 py-1.5"
+                    >
+                      <UserCheck className="w-3.5 h-3.5" /> Approve
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {pendingUsers.length === 0 && allUsers.length === 0 && (
+            <p className="text-sm text-navy-300">No other users yet. Share your site URL so others can sign up.</p>
+          )}
+
+          {allUsers.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-xs font-bold text-navy-300 uppercase tracking-widest">Approved Users</p>
+              {allUsers.map(u => (
+                <div key={u.id} className="flex items-center justify-between p-3 rounded-xl border border-surface-border bg-white">
+                  <div>
+                    <p className="text-sm font-medium text-navy">{u.email}</p>
+                    {u.is_admin && <span className="badge badge-navy mt-0.5">Admin</span>}
+                  </div>
+                  <button
+                    onClick={() => revokeUser(u.id)}
+                    className="btn-ghost text-xs px-3 py-1.5 text-red-500 hover:bg-red-50"
+                  >
+                    <UserX className="w-3.5 h-3.5" /> Revoke
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </Section>
+      )}
 
       {/* Account */}
       <Section title="Account">

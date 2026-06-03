@@ -10,10 +10,32 @@ import Schedule from '@/pages/Schedule'
 import Vaccines from '@/pages/Vaccines'
 import Settings from '@/pages/Settings'
 
+function PendingScreen() {
+  const { signOut, user } = useAuth()
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-surface p-6">
+      <div className="max-w-sm w-full card p-8 text-center">
+        <div className="w-12 h-12 rounded-full bg-yellow-50 flex items-center justify-center mx-auto mb-4">
+          <span className="text-2xl">⏳</span>
+        </div>
+        <h2 className="text-lg font-bold text-navy mb-2">Account Pending Approval</h2>
+        <p className="text-sm text-navy-300 mb-1">
+          Your account (<span className="font-medium text-navy">{user?.email}</span>) has been created but is waiting for admin approval.
+        </p>
+        <p className="text-sm text-navy-300 mb-6">
+          You'll be able to sign in once an admin approves your account.
+        </p>
+        <button onClick={signOut} className="btn-outline w-full">Sign Out</button>
+      </div>
+    </div>
+  )
+}
+
 function RequireAuth({ children }) {
-  const { user, loading } = useAuth()
+  const { user, loading, isApproved } = useAuth()
   if (loading) return <LoadingScreen />
   if (!user) return <Navigate to="/login" replace />
+  if (!isApproved) return <PendingScreen />
   return children
 }
 
