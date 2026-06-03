@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Plus Jakarta Sans', 'DM Sans', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body {
+    @apply bg-surface text-navy;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-navy-100 rounded-full;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+  }
+
+  .btn-primary {
+    @apply btn bg-navy text-white hover:bg-navy-600 active:bg-navy-700;
+  }
+
+  .btn-teal {
+    @apply btn bg-teal text-navy hover:bg-teal-500 active:bg-teal-600;
+  }
+
+  .btn-ghost {
+    @apply btn text-navy-400 hover:bg-navy-50 hover:text-navy;
+  }
+
+  .btn-outline {
+    @apply btn border border-surface-border text-navy hover:bg-surface hover:border-navy-200;
+  }
+
+  .btn-danger {
+    @apply btn bg-red-50 text-red-600 hover:bg-red-100;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl shadow-card border border-surface-border;
+  }
+
+  .input {
+    @apply w-full rounded-lg border border-surface-border bg-white px-3 py-2 text-sm text-navy placeholder:text-navy-200 focus:outline-none focus:ring-2 focus:ring-teal focus:border-transparent transition-shadow;
+  }
+
+  .label {
+    @apply block text-xs font-semibold text-navy-400 mb-1 uppercase tracking-wide;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  }
+
+  .badge-teal {
+    @apply badge bg-teal-50 text-teal-600;
+  }
+
+  .badge-navy {
+    @apply badge bg-navy-50 text-navy;
+  }
+
+  .badge-yellow {
+    @apply badge bg-yellow-50 text-yellow-700;
+  }
+
+  .badge-green {
+    @apply badge bg-green-50 text-green-700;
+  }
+
+  .badge-red {
+    @apply badge bg-red-50 text-red-600;
+  }
+
+  .badge-gray {
+    @apply badge bg-gray-100 text-gray-600;
+  }
+
+  .page-header {
+    @apply flex items-center justify-between mb-6;
+  }
+
+  .page-title {
+    @apply text-2xl font-bold text-navy;
+  }
+
+  .section-title {
+    @apply text-base font-semibold text-navy mb-3;
+  }
+
+  .stat-card {
+    @apply card p-5 flex flex-col gap-1;
+  }
+
+  .stat-label {
+    @apply text-xs font-semibold text-navy-300 uppercase tracking-wide;
+  }
+
+  .stat-value {
+    @apply text-3xl font-bold text-navy;
+  }
+}
