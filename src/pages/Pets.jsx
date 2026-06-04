@@ -8,14 +8,32 @@ import PetModal from '@/components/pets/PetModal'
 
 const SPECIES_EMOJI = { Dog: '🐕', Cat: '🐈', Bird: '🐦', Rabbit: '🐇', 'Guinea Pig': '🐹', Reptile: '🦎', Other: '🐾' }
 
-function PetCard({ pet, onEdit, onSelect }) {
+function PetAvatar({ pet, size = 'md' }) {
   const emoji = SPECIES_EMOJI[pet.species] ?? '🐾'
+  const cls = size === 'lg'
+    ? 'w-16 h-16 rounded-2xl text-3xl'
+    : 'w-10 h-10 rounded-full text-xl'
+  if (pet.photo_url) {
+    return (
+      <img
+        src={pet.photo_url}
+        alt={pet.name}
+        className={cn(cls, 'object-cover flex-shrink-0 border border-surface-border')}
+      />
+    )
+  }
+  return (
+    <div className={cn(cls, 'bg-teal-50 flex items-center justify-center flex-shrink-0')}>
+      {emoji}
+    </div>
+  )
+}
+
+function PetCard({ pet, onEdit, onSelect }) {
   return (
     <div className="card p-4 flex items-center gap-4 hover:shadow-card-hover transition-shadow">
       <button onClick={() => onSelect(pet)} className="flex items-center gap-4 flex-1 min-w-0 text-left">
-        <div className="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center text-xl flex-shrink-0">
-          {emoji}
-        </div>
+        <PetAvatar pet={pet} />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <p className="font-semibold text-navy text-sm">{pet.name}</p>
@@ -50,7 +68,6 @@ function DetailRow({ label, value }) {
 function PetDrawer({ pet, onClose, onEdit, onDeleted }) {
   const [deleting, setDeleting] = useState(false)
   const [vaccines, setVaccines] = useState([])
-  const emoji = SPECIES_EMOJI[pet.species] ?? '🐾'
 
   useEffect(() => {
     supabase
@@ -74,9 +91,7 @@ function PetDrawer({ pet, onClose, onEdit, onDeleted }) {
       <div className="relative bg-white w-full max-w-sm h-full flex flex-col shadow-2xl overflow-hidden">
         <div className="flex items-center justify-between px-5 py-4 border-b border-surface-border flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full bg-teal-50 flex items-center justify-center text-xl">
-              {emoji}
-            </div>
+            <PetAvatar pet={pet} />
             <div>
               <p className="font-bold text-navy text-sm">{pet.name}</p>
               <p className="text-xs text-navy-300">

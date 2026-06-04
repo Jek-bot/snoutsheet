@@ -6,6 +6,7 @@ import { X, Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { cn } from '@/lib/utils'
+import PetPhotoUpload from './PetPhotoUpload'
 
 const schema = z.object({
   client_id: z.string().min(1, 'Client is required'),
@@ -48,6 +49,7 @@ export default function PetModal({ pet = null, defaultClientId = null, onClose, 
   const { user } = useAuth()
   const [clients, setClients] = useState([])
   const [saving, setSaving] = useState(false)
+  const [photoUrl, setPhotoUrl] = useState(pet?.photo_url ?? null)
   const isEdit = Boolean(pet)
 
   const { register, handleSubmit, formState: { errors }, watch } = useForm({
@@ -88,6 +90,7 @@ export default function PetModal({ pet = null, defaultClientId = null, onClose, 
     const payload = {
       ...data,
       user_id: user.id,
+      photo_url: photoUrl,
       weight_lbs: data.weight_lbs ? parseFloat(data.weight_lbs) : null,
       dob: data.dob || null,
       sex: data.sex || null,
@@ -193,6 +196,14 @@ export default function PetModal({ pet = null, defaultClientId = null, onClose, 
             <Field label="Microchip Number">
               <input className="input" {...register('microchip')} placeholder="985112000000000" />
             </Field>
+
+            <SectionHeading>Photo</SectionHeading>
+
+            <PetPhotoUpload
+              petId={pet?.id}
+              currentUrl={photoUrl}
+              onUploaded={setPhotoUrl}
+            />
 
             <SectionHeading>Notes</SectionHeading>
 
