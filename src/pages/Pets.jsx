@@ -112,6 +112,7 @@ function PetDrawer({ pet, onClose, onEdit, onDeleted }) {
   }
 
   return (
+    <>
     <div className="fixed inset-0 z-40 flex justify-end">
       <div className="absolute inset-0 bg-navy/30 backdrop-blur-sm" onClick={onClose} />
       <div className="relative bg-white w-full sm:max-w-sm h-full flex flex-col shadow-2xl overflow-hidden">
@@ -211,8 +212,10 @@ function PetDrawer({ pet, onClose, onEdit, onDeleted }) {
     {lightbox && pet.photo_url && (
       <PhotoLightbox url={pet.photo_url} name={pet.name} onClose={() => setLightbox(false)} />
     )}
+    </>
   )
 }
+
 
 export default function Pets() {
   const { user } = useAuth()
