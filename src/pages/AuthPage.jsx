@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { PawPrint, Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { cn } from '@/lib/utils'
 
@@ -58,17 +58,15 @@ export default function AuthPage() {
     <div className="min-h-screen flex">
       {/* Left panel */}
       <div className="hidden lg:flex w-1/2 bg-navy flex-col justify-between p-12">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-teal flex items-center justify-center">
-            <PawPrint className="w-5 h-5 text-navy" strokeWidth={2.5} />
-          </div>
-          <span className="text-white font-bold text-xl">Snoutsheet</span>
+        <div className="flex items-center">
+          <img src="/logo.png" alt="Snoutsheet" className="h-12 w-auto" />
         </div>
 
         <div>
           <p className="text-3xl font-bold text-white leading-snug mb-4">
             Your pet sitting<br />business, organized.
           </p>
+          <p className="text-white/40 text-sm">www.snoutsheet.com</p>
           <p className="text-white/60 text-sm leading-relaxed max-w-sm">
             Track clients, pets, bookings, vaccines, and your schedule — all in one warm, professional workspace built just for independent pet sitters.
           </p>
@@ -92,11 +90,8 @@ export default function AuthPage() {
       <div className="flex-1 flex items-center justify-center p-6 bg-surface">
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
-          <div className="flex lg:hidden items-center gap-2 mb-8 justify-center">
-            <div className="w-8 h-8 rounded-xl bg-navy flex items-center justify-center">
-              <PawPrint className="w-4 h-4 text-teal" strokeWidth={2.5} />
-            </div>
-            <span className="text-navy font-bold text-xl">Snoutsheet</span>
+          <div className="flex lg:hidden justify-center mb-8">
+            <img src="/logo.png" alt="Snoutsheet" className="h-20 w-auto" />
           </div>
 
           <div className="card p-8">
