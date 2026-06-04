@@ -6,7 +6,7 @@ const GOOGLE_CLIENT_SECRET = Deno.env.get('GOOGLE_CLIENT_SECRET')!
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!
 const SUPABASE_SERVICE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 const APP_URL = Deno.env.get('APP_URL') ?? 'https://snoutsheet.vercel.app'
-const REDIRECT_URI = `${APP_URL}/auth/google/callback`
+const REDIRECT_URI = Deno.env.get('REDIRECT_URI') ?? `${Deno.env.get('SUPABASE_URL')}/functions/v1/google-auth`
 
 serve(async (req) => {
   const url = new URL(req.url)

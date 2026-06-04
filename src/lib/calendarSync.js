@@ -14,10 +14,12 @@ export async function syncBookingToCalendar(bookingId, userId, action = 'upsert'
   }
 }
 
+const EDGE_FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/google-auth`
+
 export function buildGoogleAuthUrl(userId) {
   const params = new URLSearchParams({
     client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
-    redirect_uri: `${window.location.origin}/auth/google/callback`,
+    redirect_uri: EDGE_FUNCTION_URL,
     response_type: 'code',
     scope: 'https://www.googleapis.com/auth/calendar.events',
     access_type: 'offline',
