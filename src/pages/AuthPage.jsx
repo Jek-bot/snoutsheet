@@ -59,7 +59,7 @@ export default function AuthPage() {
       {/* Left panel */}
       <div className="hidden lg:flex w-1/2 bg-navy flex-col justify-between p-12">
         <div className="flex items-center">
-          <img src="/logo.png" alt="Snoutsheet" className="h-12 w-auto" />
+          <img src="/logo.png" alt="Snoutsheet" className="h-48 w-auto mix-blend-screen" />
         </div>
 
         <div>
@@ -91,7 +91,7 @@ export default function AuthPage() {
         <div className="w-full max-w-sm">
           {/* Mobile logo */}
           <div className="flex lg:hidden justify-center mb-8">
-            <img src="/logo.png" alt="Snoutsheet" className="h-20 w-auto" />
+            <img src="/logo.png" alt="Snoutsheet" className="h-28 w-auto" />
           </div>
 
           <div className="card p-8">
