@@ -6,6 +6,7 @@ import { X, Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { cn } from '@/lib/utils'
+import { syncBookingToCalendar } from '@/lib/calendarSync'
 
 const schema = z.object({
   client_id: z.string().min(1, 'Client is required'),
@@ -150,6 +151,9 @@ export default function BookingModal({ booking = null, onClose, onSaved }) {
         )
       }
     }
+
+    // Sync to Google Calendar (non-blocking)
+    if (bookingId) syncBookingToCalendar(bookingId, user.id)
 
     setSaving(false)
     onSaved()

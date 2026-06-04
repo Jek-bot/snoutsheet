@@ -3,6 +3,7 @@ import { CalendarDays, Plus, Search, Pencil, Trash2, X } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { formatDate, formatCurrency } from '@/lib/utils'
+import { syncBookingToCalendar } from '@/lib/calendarSync'
 import { cn } from '@/lib/utils'
 import BookingModal from '@/components/bookings/BookingModal'
 
@@ -52,10 +53,12 @@ function BookingCard({ booking, onEdit, onSelect }) {
 
 function BookingDrawer({ booking, onClose, onEdit, onDeleted }) {
   const [deleting, setDeleting] = useState(false)
+  const { user } = useAuth()
 
   async function handleDelete() {
     if (!confirm('Delete this booking? This cannot be undone.')) return
     setDeleting(true)
+    syncBookingToCalendar(booking.id, user.id, 'delete')
     await supabase.from('bookings').delete().eq('id', booking.id)
     onDeleted()
   }

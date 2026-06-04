@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
+import { useEffect as useEffectSettings } from 'react'
 import { Save, Link2, CheckCircle, Plus, Pencil, Trash2, Clock, UserCheck, UserX } from 'lucide-react'
+import { useSearchParams } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import ServiceModal from '@/components/services/ServiceModal'
+import { buildGoogleAuthUrl } from '@/lib/calendarSync'
 
 function Section({ title, children, action }) {
   return (
@@ -74,6 +77,9 @@ function ServiceRow({ service, onEdit, onDelete }) {
 
 export default function Settings() {
   const { user, isAdmin } = useAuth()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const gcalSuccess = searchParams.get('gcal_success')
+  const gcalError = searchParams.get('gcal_error')
   const [form, setForm] = useState({
     business_name: '',
     business_phone: '',
@@ -107,6 +113,23 @@ export default function Settings() {
     loadServices()
     if (isAdmin) loadUsers()
   }, [user, isAdmin])
+
+  // Handle gcal redirect params
+  useEffectSettings(() => {
+    if (gcalSuccess) {
+      loadSettings()
+      setSearchParams({})
+    }
+    if (gcalError) {
+      setSearchParams({})
+    }
+  }, [gcalSuccess, gcalError])
+
+  function loadSettings() {
+    if (!user) return
+    supabase.from('settings').select('*').eq('user_id', user.id).single()
+      .then(({ data }) => { if (data) setForm(f => ({ ...f, ...data })) })
+  }
 
   function loadServices() {
     supabase
@@ -265,6 +288,17 @@ export default function Settings() {
 
       {/* Google Calendar */}
       <Section title="Google Calendar">
+        {gcalSuccess && (
+          <div className="flex items-center gap-2 bg-green-50 text-green-700 rounded-xl px-4 py-3 text-sm font-medium">
+            <CheckCircle className="w-4 h-4 flex-shrink-0" />
+            Google Calendar connected successfully!
+          </div>
+        )}
+        {gcalError && (
+          <div className="bg-red-50 text-red-600 rounded-xl px-4 py-3 text-sm">
+            Connection failed ({gcalError}). Please try again.
+          </div>
+        )}
         <div className="flex items-center justify-between p-4 rounded-xl border border-surface-border bg-surface">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-white border border-surface-border flex items-center justify-center">
@@ -277,25 +311,39 @@ export default function Settings() {
             <div>
               <p className="text-sm font-semibold text-navy">Google Calendar</p>
               <p className="text-xs text-navy-300">
-                {form.gcal_connected ? 'Connected — bookings sync automatically' : 'Not connected'}
+                {form.gcal_connected ? 'Connected — confirmed bookings sync automatically' : 'Not connected'}
               </p>
             </div>
           </div>
           {form.gcal_connected ? (
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-green-500" />
-              <button className="btn-outline text-red-600 border-red-200 hover:bg-red-50 text-xs px-3 py-1.5">
+              <button
+                onClick={async () => {
+                  if (!confirm('Disconnect Google Calendar? Existing calendar events won\'t be deleted.')) return
+                  await supabase.from('settings').update({
+                    gcal_connected: false,
+                    gcal_calendar_id: null,
+                    gcal_refresh_token: null,
+                  }).eq('user_id', user.id)
+                  setForm(f => ({ ...f, gcal_connected: false, gcal_calendar_id: null }))
+                }}
+                className="btn-outline text-red-600 border-red-200 hover:bg-red-50 text-xs px-3 py-1.5"
+              >
                 Disconnect
               </button>
             </div>
           ) : (
-            <button className="btn-outline text-xs px-3 py-1.5 flex items-center gap-1.5">
+            <button
+              onClick={() => { window.location.href = buildGoogleAuthUrl(user.id) }}
+              className="btn-outline text-xs px-3 py-1.5 flex items-center gap-1.5"
+            >
               <Link2 className="w-3.5 h-3.5" /> Connect
             </button>
           )}
         </div>
         <p className="text-xs text-navy-300">
-          When connected, confirmed bookings are automatically added to your Google Calendar and kept in sync.
+          When connected, confirmed and active bookings are automatically added to your Google Calendar and kept in sync.
         </p>
       </Section>
 

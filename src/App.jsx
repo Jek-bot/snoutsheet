@@ -9,6 +9,7 @@ import Bookings from '@/pages/Bookings'
 import Schedule from '@/pages/Schedule'
 import Vaccines from '@/pages/Vaccines'
 import Settings from '@/pages/Settings'
+import GoogleCallback from '@/pages/GoogleCallback'
 
 function PendingScreen() {
   const { signOut, user } = useAuth()
@@ -77,6 +78,7 @@ export default function App() {
         <Route path="vaccines" element={<Vaccines />} />
         <Route path="settings" element={<Settings />} />
       </Route>
+      <Route path="/auth/google/callback" element={<GoogleCallback />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
