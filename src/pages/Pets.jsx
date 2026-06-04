@@ -192,6 +192,42 @@ function PetDrawer({ pet, onClose, onEdit, onDeleted }) {
               <p className="text-sm text-navy whitespace-pre-wrap">{pet.medical_notes}</p>
             </div>
           )}
+
+          {/* Temperament */}
+          {[
+            { key: 'good_with_children', label: 'Good with children' },
+            { key: 'good_with_animals', label: 'Likes other animals' },
+            { key: 'good_with_strangers', label: 'Good with strangers' },
+            { key: 'good_with_men', label: 'Good with men' },
+            { key: 'good_with_women', label: 'Good with women' },
+          ].some(({ key }) => pet[key] !== null && pet[key] !== undefined) && (
+            <div className="space-y-2">
+              <p className="text-xs font-bold text-navy-300 uppercase tracking-widest">Temperament</p>
+              <div className="space-y-1.5">
+                {[
+                  { key: 'good_with_children', label: 'Good with children' },
+                  { key: 'good_with_animals', label: 'Likes other animals' },
+                  { key: 'good_with_strangers', label: 'Good with strangers' },
+                  { key: 'good_with_men', label: 'Good with men' },
+                  { key: 'good_with_women', label: 'Good with women' },
+                ].map(({ key, label }) => {
+                  const val = pet[key]
+                  if (val === null || val === undefined) return null
+                  return (
+                    <div key={key} className="flex items-center justify-between">
+                      <span className="text-sm text-navy-400">{label}</span>
+                      <span className={cn(
+                        'badge',
+                        val ? 'badge-green' : 'badge-red'
+                      )}>
+                        {val ? '✓ Yes' : '✗ No'}
+                      </span>
+                    </div>
+                  )
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-2 px-5 py-4 border-t border-surface-border flex-shrink-0">

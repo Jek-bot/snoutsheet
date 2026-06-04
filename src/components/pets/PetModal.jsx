@@ -26,6 +26,38 @@ const schema = z.object({
 const SPECIES = ['Dog', 'Cat', 'Bird', 'Rabbit', 'Guinea Pig', 'Reptile', 'Other']
 const SEXES = ['', 'Male', 'Female', 'Unknown']
 
+const TEMPERAMENT_QUESTIONS = [
+  { key: 'good_with_children', label: 'Good with children?' },
+  { key: 'good_with_animals', label: 'Likes other animals?' },
+  { key: 'good_with_strangers', label: 'Good with strangers?' },
+  { key: 'good_with_men', label: 'Good with men?' },
+  { key: 'good_with_women', label: 'Good with women?' },
+]
+
+function TriToggle({ value, onChange }) {
+  return (
+    <div className="flex rounded-lg border border-surface-border overflow-hidden text-xs font-semibold">
+      {[
+        { val: true, label: 'Yes', active: 'bg-green-500 text-white border-green-500' },
+        { val: null, label: '?', active: 'bg-navy-100 text-navy' },
+        { val: false, label: 'No', active: 'bg-red-400 text-white border-red-400' },
+      ].map(({ val, label, active }) => (
+        <button
+          key={String(val)}
+          type="button"
+          onClick={() => onChange(value === val ? null : val)}
+          className={cn(
+            'flex-1 py-1.5 transition-colors',
+            value === val ? active : 'bg-white text-navy-300 hover:bg-surface'
+          )}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
 function Field({ label, error, children }) {
   return (
     <div>
@@ -50,6 +82,13 @@ export default function PetModal({ pet = null, defaultClientId = null, onClose, 
   const [clients, setClients] = useState([])
   const [saving, setSaving] = useState(false)
   const [photoUrl, setPhotoUrl] = useState(pet?.photo_url ?? null)
+  const [temperament, setTemperament] = useState({
+    good_with_children: pet?.good_with_children ?? null,
+    good_with_animals: pet?.good_with_animals ?? null,
+    good_with_strangers: pet?.good_with_strangers ?? null,
+    good_with_men: pet?.good_with_men ?? null,
+    good_with_women: pet?.good_with_women ?? null,
+  })
   const isEdit = Boolean(pet)
 
   const { register, handleSubmit, formState: { errors }, watch } = useForm({
@@ -91,6 +130,7 @@ export default function PetModal({ pet = null, defaultClientId = null, onClose, 
       ...data,
       user_id: user.id,
       photo_url: photoUrl,
+      ...temperament,
       weight_lbs: data.weight_lbs ? parseFloat(data.weight_lbs) : null,
       dob: data.dob || null,
       sex: data.sex || null,
@@ -196,6 +236,22 @@ export default function PetModal({ pet = null, defaultClientId = null, onClose, 
             <Field label="Microchip Number">
               <input className="input" {...register('microchip')} placeholder="985112000000000" />
             </Field>
+
+            <SectionHeading>Temperament</SectionHeading>
+
+            <div className="space-y-3">
+              {TEMPERAMENT_QUESTIONS.map(({ key, label }) => (
+                <div key={key} className="flex items-center justify-between gap-4">
+                  <span className="text-sm text-navy flex-1">{label}</span>
+                  <div className="w-32 flex-shrink-0">
+                    <TriToggle
+                      value={temperament[key]}
+                      onChange={val => setTemperament(t => ({ ...t, [key]: val }))}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
 
             <SectionHeading>Photo</SectionHeading>
 
