@@ -34,9 +34,13 @@ function buildEvent(booking: any): any {
   const serviceName = booking.services?.name ?? 'Pet Sitting'
   const pets = booking.booking_pets?.map((bp: any) => bp.pets?.name).filter(Boolean).join(', ')
 
+  const isInquiry = booking.status === 'inquiry'
+  const prefix = isInquiry ? '[INQUIRY] ' : ''
+
   return {
-    summary: `${serviceName} — ${clientName}${pets ? ` (${pets})` : ''}`,
+    summary: `${prefix}${serviceName} — ${clientName}${pets ? ` (${pets})` : ''}`,
     description: [
+      isInquiry ? '⚠️ This is a tentative inquiry, not yet confirmed.' : null,
       pets ? `Pets: ${pets}` : null,
       booking.notes ? `Notes: ${booking.notes}` : null,
       `Status: ${booking.status}`,
@@ -48,7 +52,10 @@ function buildEvent(booking: any): any {
     end: booking.all_day
       ? { date: booking.end_date.split('T')[0] }
       : { dateTime: booking.end_date, timeZone: 'UTC' },
-    colorId: booking.status === 'confirmed' ? '2' : booking.status === 'active' ? '5' : '8',
+    // Color IDs: 2=sage(confirmed), 5=banana(inquiry), 6=tangerine(active), 8=graphite(other)
+    colorId: booking.status === 'confirmed' ? '2' : booking.status === 'active' ? '6' : booking.status === 'inquiry' ? '5' : '8',
+    // Mark inquiries as tentative
+    status: isInquiry ? 'tentative' : 'confirmed',
   }
 }
 
@@ -108,8 +115,8 @@ serve(async (req) => {
 
     if (!booking) throw new Error('Booking not found')
 
-    // Only sync confirmed/active bookings
-    if (!['confirmed', 'active'].includes(booking.status)) {
+    // Only sync inquiry/confirmed/active bookings
+    if (!['inquiry', 'confirmed', 'active'].includes(booking.status)) {
       // If it was synced before but status changed, remove from calendar
       if (booking.gcal_event_id) {
         await fetch(`${baseUrl}/${booking.gcal_event_id}`, {
