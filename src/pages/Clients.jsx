@@ -138,6 +138,7 @@ function ClientDrawer({ client, onClose, onEdit, onDeleted }) {
             <div className="space-y-3">
               <p className="text-xs font-bold text-navy-300 uppercase tracking-widest">Veterinarian</p>
               <DetailRow label="Clinic" value={client.vet_name} />
+              <DetailRow label="Preferred Dr." value={client.vet_preferred_dr} />
               <DetailRow label="Phone" value={client.vet_phone} />
               <DetailRow label="Address" value={client.vet_address} />
             </div>

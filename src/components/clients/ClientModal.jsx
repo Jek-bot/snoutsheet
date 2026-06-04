@@ -22,6 +22,7 @@ const schema = z.object({
   vet_name: z.string().optional(),
   vet_phone: z.string().optional(),
   vet_address: z.string().optional(),
+  vet_preferred_dr: z.string().optional(),
 })
 
 function Field({ label, error, children }) {
@@ -65,6 +66,7 @@ export default function ClientModal({ client = null, onClose, onSaved }) {
       vet_name: client?.vet_name ?? '',
       vet_phone: client?.vet_phone ?? '',
       vet_address: client?.vet_address ?? '',
+      vet_preferred_dr: client?.vet_preferred_dr ?? '',
     },
   })
 
@@ -175,6 +177,10 @@ export default function ClientModal({ client = null, onClose, onSaved }) {
                 <input className="input" {...register('vet_phone')} placeholder="(555) 000-0002" />
               </Field>
             </div>
+
+            <Field label="Preferred Dr.">
+              <input className="input" {...register('vet_preferred_dr')} placeholder="Dr. Smith" />
+            </Field>
 
             <Field label="Vet Address">
               <input className="input" {...register('vet_address')} placeholder="456 Vet Ave, City, ST" />
