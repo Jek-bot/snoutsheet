@@ -54,6 +54,7 @@ export default function BookingModal({ booking = null, onClose, onSaved }) {
     booking?._pets?.map(p => p.pet_id) ?? []
   )
   const [saving, setSaving] = useState(false)
+  const [allDay, setAllDay] = useState(booking?.all_day ?? false)
   const isEdit = Boolean(booking)
 
   const toLocalDatetime = (iso) => {
@@ -63,14 +64,21 @@ export default function BookingModal({ booking = null, onClose, onSaved }) {
     return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
   }
 
+  const toLocalDate = (iso) => {
+    if (!iso) return ''
+    const d = new Date(iso)
+    const pad = n => String(n).padStart(2, '0')
+    return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`
+  }
+
   const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm({
     resolver: zodResolver(schema),
     defaultValues: {
       client_id: booking?.client_id ?? '',
       service_id: booking?.service_id ?? '',
       status: booking?.status ?? 'inquiry',
-      start_date: toLocalDatetime(booking?.start_date),
-      end_date: toLocalDatetime(booking?.end_date),
+      start_date: booking?.all_day ? toLocalDate(booking?.start_date) : toLocalDatetime(booking?.start_date),
+      end_date: booking?.all_day ? toLocalDate(booking?.end_date) : toLocalDatetime(booking?.end_date),
       price: booking?.price?.toString() ?? '',
       paid: booking?.paid ?? false,
       payment_method: booking?.payment_method ?? '',
@@ -126,10 +134,15 @@ export default function BookingModal({ booking = null, onClose, onSaved }) {
     const payload = {
       ...data,
       user_id: user.id,
+      all_day: allDay,
       price: data.price ? parseFloat(data.price) : null,
       service_id: data.service_id || null,
-      start_date: new Date(data.start_date).toISOString(),
-      end_date: new Date(data.end_date).toISOString(),
+      start_date: allDay
+        ? new Date(data.start_date + 'T00:00:00').toISOString()
+        : new Date(data.start_date).toISOString(),
+      end_date: allDay
+        ? new Date(data.end_date + 'T23:59:59').toISOString()
+        : new Date(data.end_date).toISOString(),
       paid: Boolean(data.paid),
       payment_method: data.payment_method || null,
     }
@@ -232,18 +245,35 @@ export default function BookingModal({ booking = null, onClose, onSaved }) {
 
             <SectionHeading>Dates</SectionHeading>
 
+            <div className="flex items-center gap-3">
+              <input
+                id="all_day"
+                type="checkbox"
+                className="w-4 h-4 rounded border-surface-border accent-teal"
+                checked={allDay}
+                onChange={e => {
+                  setAllDay(e.target.checked)
+                  setValue('start_date', '')
+                  setValue('end_date', '')
+                }}
+              />
+              <label htmlFor="all_day" className="text-sm font-medium text-navy cursor-pointer">
+                All-day event
+              </label>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <Field label="Start *" error={errors.start_date?.message}>
                 <input
                   className={cn('input', errors.start_date && 'border-red-400')}
-                  type="datetime-local"
+                  type={allDay ? 'date' : 'datetime-local'}
                   {...register('start_date')}
                 />
               </Field>
               <Field label="End *" error={errors.end_date?.message}>
                 <input
                   className={cn('input', errors.end_date && 'border-red-400')}
-                  type="datetime-local"
+                  type={allDay ? 'date' : 'datetime-local'}
                   {...register('end_date')}
                 />
               </Field>

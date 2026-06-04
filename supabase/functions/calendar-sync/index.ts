@@ -42,8 +42,12 @@ function buildEvent(booking: any): any {
       `Status: ${booking.status}`,
       booking.price ? `Price: $${booking.price}` : null,
     ].filter(Boolean).join('\n'),
-    start: { dateTime: booking.start_date, timeZone: 'UTC' },
-    end: { dateTime: booking.end_date, timeZone: 'UTC' },
+    start: booking.all_day
+      ? { date: booking.start_date.split('T')[0] }
+      : { dateTime: booking.start_date, timeZone: 'UTC' },
+    end: booking.all_day
+      ? { date: booking.end_date.split('T')[0] }
+      : { dateTime: booking.end_date, timeZone: 'UTC' },
     colorId: booking.status === 'confirmed' ? '2' : booking.status === 'active' ? '5' : '8',
   }
 }
