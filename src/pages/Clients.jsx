@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Users, Plus, Search, Phone, Mail, ChevronRight, Pencil, Trash2, X } from 'lucide-react'
+import { Users, Plus, Search, Phone, Mail, ChevronRight, Pencil, Trash2, X, Share2, RefreshCw, Copy, Check } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { initials, formatDate } from '@/lib/utils'
@@ -51,9 +51,16 @@ function DetailRow({ label, value }) {
   )
 }
 
-function ClientDrawer({ client, onClose, onEdit, onDeleted }) {
+function ClientDrawer({ client, onClose, onEdit, onDeleted, onUpdated }) {
   const [deleting, setDeleting] = useState(false)
   const [pets, setPets] = useState([])
+  const [copied, setCopied] = useState(false)
+  const [regenerating, setRegenerating] = useState(false)
+  const [portalToken, setPortalToken] = useState(client?.portal_token)
+
+  useEffect(() => {
+    setPortalToken(client?.portal_token)
+  }, [client])
 
   useEffect(() => {
     if (!client) return
@@ -70,6 +77,26 @@ function ClientDrawer({ client, onClose, onEdit, onDeleted }) {
     setDeleting(true)
     await supabase.from('clients').delete().eq('id', client.id)
     onDeleted()
+  }
+
+  function portalUrl(token) {
+    return `${window.location.origin}/portal/${token}`
+  }
+
+  async function copyLink() {
+    await navigator.clipboard.writeText(portalUrl(portalToken))
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  async function regenerateToken() {
+    if (!confirm('Regenerate portal link? The old link will stop working immediately.')) return
+    setRegenerating(true)
+    const newToken = crypto.randomUUID()
+    await supabase.from('clients').update({ portal_token: newToken }).eq('id', client.id)
+    setPortalToken(newToken)
+    setRegenerating(false)
+    if (onUpdated) onUpdated()
   }
 
   if (!client) return null
@@ -169,6 +196,35 @@ function ClientDrawer({ client, onClose, onEdit, onDeleted }) {
               <p className="text-sm text-navy whitespace-pre-wrap">{client.notes}</p>
             </div>
           )}
+
+          {/* Portal link */}
+          <div className="space-y-2">
+            <p className="text-xs font-bold text-navy-300 uppercase tracking-widest">Client Portal</p>
+            <p className="text-xs text-navy-300">Share this link with your client for a read-only view of their pets and bookings.</p>
+            {portalToken && (
+              <div className="flex items-center gap-2 bg-surface rounded-xl px-3 py-2 border border-surface-border">
+                <p className="text-xs text-navy-400 truncate flex-1 font-mono">
+                  {portalUrl(portalToken)}
+                </p>
+              </div>
+            )}
+            <div className="flex gap-2">
+              <button
+                onClick={copyLink}
+                className="btn-teal text-xs px-3 py-1.5 flex-1"
+              >
+                {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                {copied ? 'Copied!' : 'Copy Link'}
+              </button>
+              <button
+                onClick={regenerateToken}
+                className={cn('btn-outline text-xs px-3 py-1.5', regenerating && 'opacity-70 pointer-events-none')}
+                title="Regenerate link — invalidates the old one"
+              >
+                <RefreshCw className={cn('w-3.5 h-3.5', regenerating && 'animate-spin')} />
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Footer */}
@@ -296,6 +352,7 @@ export default function Clients() {
           onClose={() => setSelectedClient(null)}
           onEdit={openEdit}
           onDeleted={onDeleted}
+          onUpdated={loadClients}
         />
       )}
     </div>
