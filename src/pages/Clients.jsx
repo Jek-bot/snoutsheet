@@ -79,7 +79,7 @@ function ClientDrawer({ client, onClose, onEdit, onDeleted }) {
   return (
     <div className="fixed inset-0 z-40 flex justify-end">
       <div className="absolute inset-0 bg-navy/30 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white w-full max-w-sm h-full flex flex-col shadow-2xl overflow-hidden">
+      <div className="relative bg-white w-full sm:max-w-sm h-full flex flex-col shadow-2xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-surface-border flex-shrink-0">
           <div className="flex items-center gap-3">
