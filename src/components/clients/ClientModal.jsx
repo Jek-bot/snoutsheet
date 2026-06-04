@@ -19,6 +19,9 @@ const schema = z.object({
   notes: z.string().optional(),
   emergency_contact_name: z.string().optional(),
   emergency_contact_phone: z.string().optional(),
+  second_contact_name: z.string().optional(),
+  second_contact_email: z.string().email('Invalid email').or(z.literal('')).optional(),
+  second_contact_phone: z.string().optional(),
   vet_name: z.string().optional(),
   vet_phone: z.string().optional(),
   vet_address: z.string().optional(),
@@ -63,6 +66,9 @@ export default function ClientModal({ client = null, onClose, onSaved }) {
       notes: client?.notes ?? '',
       emergency_contact_name: client?.emergency_contact_name ?? '',
       emergency_contact_phone: client?.emergency_contact_phone ?? '',
+      second_contact_name: client?.second_contact_name ?? '',
+      second_contact_email: client?.second_contact_email ?? '',
+      second_contact_phone: client?.second_contact_phone ?? '',
       vet_name: client?.vet_name ?? '',
       vet_phone: client?.vet_phone ?? '',
       vet_address: client?.vet_address ?? '',
@@ -164,6 +170,26 @@ export default function ClientModal({ client = null, onClose, onSaved }) {
               </Field>
               <Field label="Phone">
                 <input className="input" {...register('emergency_contact_phone')} placeholder="(555) 000-0001" />
+              </Field>
+            </div>
+
+            <SectionHeading>Second Contact</SectionHeading>
+
+            <Field label="Name">
+              <input className="input" {...register('second_contact_name')} placeholder="Jane Smith" />
+            </Field>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Field label="Email" error={errors.second_contact_email?.message}>
+                <input
+                  className={cn('input', errors.second_contact_email && 'border-red-400')}
+                  type="email"
+                  {...register('second_contact_email')}
+                  placeholder="jane@example.com"
+                />
+              </Field>
+              <Field label="Phone">
+                <input className="input" {...register('second_contact_phone')} placeholder="(555) 000-0002" />
               </Field>
             </div>
 

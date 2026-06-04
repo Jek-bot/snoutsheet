@@ -133,6 +133,16 @@ function ClientDrawer({ client, onClose, onEdit, onDeleted }) {
             </div>
           )}
 
+          {/* Second contact */}
+          {(client.second_contact_name || client.second_contact_email || client.second_contact_phone) && (
+            <div className="space-y-3">
+              <p className="text-xs font-bold text-navy-300 uppercase tracking-widest">Second Contact</p>
+              <DetailRow label="Name" value={client.second_contact_name} />
+              <DetailRow label="Email" value={client.second_contact_email} />
+              <DetailRow label="Phone" value={client.second_contact_phone} />
+            </div>
+          )}
+
           {/* Vet */}
           {(client.vet_name || client.vet_phone) && (
             <div className="space-y-3">
