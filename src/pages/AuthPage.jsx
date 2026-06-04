@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 
 export default function AuthPage() {
   const { signIn, signUp } = useAuth()
-  const [mode, setMode] = useState('signin') // 'signin' | 'signup'
+  const [mode, setMode] = useState('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -28,23 +28,13 @@ export default function AuthPage() {
     setSuccess('')
 
     if (mode === 'signup') {
-      if (password.length < 8) {
-        setError('Password must be at least 8 characters.')
-        return
-      }
-      if (password !== confirmPassword) {
-        setError('Passwords do not match.')
-        return
-      }
+      if (password.length < 8) { setError('Password must be at least 8 characters.'); return }
+      if (password !== confirmPassword) { setError('Passwords do not match.'); return }
       setLoading(true)
       const { error } = await signUp(email, password)
       setLoading(false)
-      if (error) {
-        setError(error.message)
-      } else {
-        setSuccess('Account created! Check your email to confirm your address, then sign in.')
-        switchMode('signin')
-      }
+      if (error) { setError(error.message) }
+      else { setSuccess('Account created! Check your email to confirm, then sign in.'); switchMode('signin') }
       return
     }
 
@@ -56,89 +46,88 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen flex">
-      {/* Left panel */}
-      <div className="hidden lg:flex w-1/2 bg-navy flex-col justify-between p-12">
-        <div className="flex items-center">
-          <img src="/logo.png" alt="Snoutsheet" className="h-48 w-auto mix-blend-screen" />
-        </div>
 
+      {/* ── Left panel ───────────────────────────────────────────── */}
+      <div className="hidden lg:flex w-1/2 bg-navy flex-col justify-between p-16">
+
+        {/* Logo */}
         <div>
-          <p className="text-3xl font-bold text-white leading-snug mb-4">
-            Your pet sitting<br />business, organized.
-          </p>
-          <p className="text-white/40 text-sm">www.snoutsheet.com</p>
-          <p className="text-white/60 text-sm leading-relaxed max-w-sm">
-            Track clients, pets, bookings, vaccines, and your schedule — all in one warm, professional workspace built just for independent pet sitters.
-          </p>
+          <img src="/logo.png" alt="Snoutsheet" className="h-56 w-auto mix-blend-screen" />
         </div>
 
-        <div className="flex gap-6">
-          {[
-            { value: '∞', label: 'Clients' },
-            { value: '∞', label: 'Pets' },
-            { value: '∞', label: 'Bookings' },
-          ].map(({ value, label }) => (
-            <div key={label}>
-              <p className="text-teal text-2xl font-bold">{value}</p>
-              <p className="text-white/50 text-xs mt-0.5">{label}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Right panel */}
-      <div className="flex-1 flex items-center justify-center p-6 bg-surface">
-        <div className="w-full max-w-sm">
-          {/* Mobile logo */}
-          <div className="flex lg:hidden justify-center mb-8">
-            <img src="/logo.png" alt="Snoutsheet" className="h-28 w-auto" />
+        {/* Headline */}
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-5xl font-bold text-white leading-tight mb-4">
+              Your pet sitting<br />business,<br />organized.
+            </h1>
+            <p className="text-white/60 text-lg leading-relaxed max-w-sm">
+              Track clients, pets, bookings, vaccines, and your schedule — all in one warm, professional workspace built for independent pet sitters.
+            </p>
           </div>
 
-          <div className="card p-8">
-            {/* Mode tabs */}
-            <div className="flex rounded-xl bg-surface border border-surface-border p-1 mb-6">
-              <button
-                type="button"
-                onClick={() => switchMode('signin')}
-                className={cn(
-                  'flex-1 py-1.5 text-sm font-semibold rounded-lg transition-all',
-                  mode === 'signin'
-                    ? 'bg-white text-navy shadow-card'
-                    : 'text-navy-300 hover:text-navy'
-                )}
-              >
-                Sign In
-              </button>
-              <button
-                type="button"
-                onClick={() => switchMode('signup')}
-                className={cn(
-                  'flex-1 py-1.5 text-sm font-semibold rounded-lg transition-all',
-                  mode === 'signup'
-                    ? 'bg-white text-navy shadow-card'
-                    : 'text-navy-300 hover:text-navy'
-                )}
-              >
-                Sign Up
-              </button>
+          {/* Stats */}
+          <div className="flex gap-10 pt-2">
+            {[
+              { value: '∞', label: 'Clients' },
+              { value: '∞', label: 'Pets' },
+              { value: '∞', label: 'Bookings' },
+            ].map(({ value, label }) => (
+              <div key={label}>
+                <p className="text-teal text-4xl font-bold">{value}</p>
+                <p className="text-white/50 text-sm mt-1">{label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Footer */}
+        <p className="text-white/30 text-sm">www.snoutsheet.com</p>
+      </div>
+
+      {/* ── Right panel ──────────────────────────────────────────── */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-surface">
+        <div className="w-full max-w-md">
+
+          {/* Mobile logo */}
+          <div className="flex lg:hidden justify-center mb-10">
+            <img src="/logo.png" alt="Snoutsheet" className="h-32 w-auto" />
+          </div>
+
+          {/* Card */}
+          <div className="card p-10">
+
+            {/* Tabs */}
+            <div className="flex rounded-xl bg-surface border border-surface-border p-1 mb-8">
+              {['signin', 'signup'].map(m => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => switchMode(m)}
+                  className={cn(
+                    'flex-1 py-2 text-sm font-semibold rounded-lg transition-all',
+                    mode === m ? 'bg-white text-navy shadow-card' : 'text-navy-300 hover:text-navy'
+                  )}
+                >
+                  {m === 'signin' ? 'Sign In' : 'Sign Up'}
+                </button>
+              ))}
             </div>
 
-            <h2 className="text-xl font-bold text-navy mb-1">
+            <h2 className="text-2xl font-bold text-navy mb-1">
               {mode === 'signin' ? 'Welcome back' : 'Create your account'}
             </h2>
-            <p className="text-sm text-navy-300 mb-6">
-              {mode === 'signin'
-                ? 'Sign in to your account'
-                : 'Set up your pet sitting workspace'}
+            <p className="text-base text-navy-300 mb-8">
+              {mode === 'signin' ? 'Sign in to your account' : 'Set up your pet sitting workspace'}
             </p>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label className="label" htmlFor="email">Email</label>
                 <input
                   id="email"
                   type="email"
-                  className="input"
+                  className="input py-3 text-base"
                   placeholder="you@example.com"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
@@ -153,7 +142,7 @@ export default function AuthPage() {
                   <input
                     id="password"
                     type={showPw ? 'text' : 'password'}
-                    className="input pr-10"
+                    className="input py-3 text-base pr-12"
                     placeholder={mode === 'signup' ? 'At least 8 characters' : '••••••••'}
                     value={password}
                     onChange={e => setPassword(e.target.value)}
@@ -163,10 +152,10 @@ export default function AuthPage() {
                   <button
                     type="button"
                     onClick={() => setShowPw(v => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-navy-300 hover:text-navy"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-navy-300 hover:text-navy"
                     tabIndex={-1}
                   >
-                    {showPw ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPw ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
               </div>
@@ -177,7 +166,7 @@ export default function AuthPage() {
                   <input
                     id="confirm-password"
                     type={showPw ? 'text' : 'password'}
-                    className="input"
+                    className="input py-3 text-base"
                     placeholder="••••••••"
                     value={confirmPassword}
                     onChange={e => setConfirmPassword(e.target.value)}
@@ -188,15 +177,15 @@ export default function AuthPage() {
               )}
 
               {error && (
-                <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>
+                <p className="text-sm text-red-600 bg-red-50 rounded-xl px-4 py-3">{error}</p>
               )}
               {success && (
-                <p className="text-sm text-green-700 bg-green-50 rounded-lg px-3 py-2">{success}</p>
+                <p className="text-sm text-green-700 bg-green-50 rounded-xl px-4 py-3">{success}</p>
               )}
 
               <button
                 type="submit"
-                className={cn('btn-primary w-full py-2.5', loading && 'opacity-70 pointer-events-none')}
+                className={cn('btn-primary w-full py-3.5 text-base mt-2', loading && 'opacity-70 pointer-events-none')}
               >
                 {loading
                   ? (mode === 'signup' ? 'Creating account…' : 'Signing in…')
@@ -205,7 +194,7 @@ export default function AuthPage() {
             </form>
           </div>
 
-          <p className="text-center text-xs text-navy-300 mt-4">
+          <p className="text-center text-sm text-navy-300 mt-5">
             Each account has its own private client and booking data.
           </p>
         </div>
