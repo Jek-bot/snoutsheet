@@ -155,19 +155,12 @@ export default function Settings() {
 
   async function loadUsers() {
     const { data } = await supabase
-      .from('user_profiles')
-      .select('id, approved, is_admin, created_at')
+      .from('user_profiles_with_email')
+      .select('id, approved, is_admin, created_at, email')
       .order('created_at')
     if (!data) return
-    // Fetch emails via auth.users — available only via admin, so we store email in metadata
-    // Instead, join against a view or use the id to fetch email from auth.users via RPC if available
-    // For now display by id; enrich with email if accessible
-    const enriched = await Promise.all(data.map(async (p) => {
-      // Try to get email from the user's own metadata (only works for own user)
-      return { ...p, email: p.id === user.id ? user.email : p.id }
-    }))
-    setPendingUsers(enriched.filter(u => !u.approved))
-    setAllUsers(enriched.filter(u => u.approved && u.id !== user.id))
+    setPendingUsers(data.filter(u => !u.approved))
+    setAllUsers(data.filter(u => u.approved && u.id !== user.id))
   }
 
   async function approveUser(id) {
