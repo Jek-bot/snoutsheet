@@ -154,6 +154,14 @@ function ClientDrawer({ client, onClose, onEdit, onDeleted }) {
             </div>
           )}
 
+          {/* Trash day */}
+          {client.trash_day && (
+            <div className="space-y-1">
+              <p className="text-xs font-bold text-navy-300 uppercase tracking-widest">Trash Day</p>
+              <p className="text-sm text-navy">{client.trash_day}</p>
+            </div>
+          )}
+
           {/* Notes */}
           {client.notes && (
             <div className="space-y-2">

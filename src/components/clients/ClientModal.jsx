@@ -16,6 +16,7 @@ const schema = z.object({
   city: z.string().optional(),
   state: z.string().optional(),
   zip: z.string().optional(),
+  trash_day: z.string().optional(),
   notes: z.string().optional(),
   emergency_contact_name: z.string().optional(),
   emergency_contact_phone: z.string().optional(),
@@ -63,6 +64,7 @@ export default function ClientModal({ client = null, onClose, onSaved }) {
       city: client?.city ?? '',
       state: client?.state ?? '',
       zip: client?.zip ?? '',
+      trash_day: client?.trash_day ?? '',
       notes: client?.notes ?? '',
       emergency_contact_name: client?.emergency_contact_name ?? '',
       emergency_contact_phone: client?.emergency_contact_phone ?? '',
@@ -210,6 +212,17 @@ export default function ClientModal({ client = null, onClose, onSaved }) {
 
             <Field label="Vet Address">
               <input className="input" {...register('vet_address')} placeholder="456 Vet Ave, City, ST" />
+            </Field>
+
+            <Field label="Trash Day">
+              <select className="input" {...register('trash_day')}>
+                <option value="">Not set</option>
+                <option value="Monday">Monday</option>
+                <option value="Tuesday">Tuesday</option>
+                <option value="Wednesday">Wednesday</option>
+                <option value="Thursday">Thursday</option>
+                <option value="Friday">Friday</option>
+              </select>
             </Field>
 
             <SectionHeading>Notes</SectionHeading>
