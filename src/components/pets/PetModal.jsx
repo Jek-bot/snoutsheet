@@ -120,7 +120,7 @@ export default function PetModal({ pet = null, defaultClientId = null, onClose, 
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col flex-1 overflow-hidden">
-          <div className="overflow-y-auto px-6 py-4 space-y-4">
+          <div className="overflow-y-auto px-4 py-4 space-y-4">
 
             <SectionHeading>Owner</SectionHeading>
 
@@ -140,7 +140,7 @@ export default function PetModal({ pet = null, defaultClientId = null, onClose, 
 
             <SectionHeading>Basic Info</SectionHeading>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <Field label="Pet Name *" error={errors.name?.message}>
                 <input
                   className={cn('input', errors.name && 'border-red-400 focus:ring-red-400')}
@@ -156,7 +156,7 @@ export default function PetModal({ pet = null, defaultClientId = null, onClose, 
               </Field>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-3">
               <Field label="Breed">
                 <input className="input" {...register('breed')} placeholder="Golden Retriever" />
               </Field>
@@ -167,7 +167,7 @@ export default function PetModal({ pet = null, defaultClientId = null, onClose, 
 
             <SectionHeading>Details</SectionHeading>
 
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <Field label="Date of Birth">
                 <input className="input" type="date" {...register('dob')} />
               </Field>
@@ -226,7 +226,7 @@ export default function PetModal({ pet = null, defaultClientId = null, onClose, 
             </Field>
           </div>
 
-          <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-surface-border flex-shrink-0">
+          <div className="flex items-center justify-end gap-3 px-4 py-4 border-t border-surface-border flex-shrink-0">
             <button type="button" onClick={onClose} className="btn-outline">Cancel</button>
             <button
               type="submit"

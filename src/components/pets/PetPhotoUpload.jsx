@@ -56,8 +56,6 @@ export default function PetPhotoUpload({ petId, currentUrl, onUploaded }) {
 
   return (
     <div className="space-y-2">
-      <label className="label">Photo</label>
-
       {preview ? (
         <div className="relative w-24 h-24">
           <img
