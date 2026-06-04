@@ -106,6 +106,16 @@ function ClientDrawer({ client, onClose, onEdit, onDeleted }) {
             <DetailRow label="Address" value={address} />
           </div>
 
+          {/* Second contact */}
+          {(client.second_contact_name || client.second_contact_email || client.second_contact_phone) && (
+            <div className="space-y-3">
+              <p className="text-xs font-bold text-navy-300 uppercase tracking-widest">Second Contact</p>
+              <DetailRow label="Name" value={client.second_contact_name} />
+              <DetailRow label="Email" value={client.second_contact_email} />
+              <DetailRow label="Phone" value={client.second_contact_phone} />
+            </div>
+          )}
+
           {/* Pets */}
           <div className="space-y-2">
             <p className="text-xs font-bold text-navy-300 uppercase tracking-widest">Pets ({pets.length})</p>
@@ -130,16 +140,6 @@ function ClientDrawer({ client, onClose, onEdit, onDeleted }) {
               <p className="text-xs font-bold text-navy-300 uppercase tracking-widest">Emergency Contact</p>
               <DetailRow label="Name" value={client.emergency_contact_name} />
               <DetailRow label="Phone" value={client.emergency_contact_phone} />
-            </div>
-          )}
-
-          {/* Second contact */}
-          {(client.second_contact_name || client.second_contact_email || client.second_contact_phone) && (
-            <div className="space-y-3">
-              <p className="text-xs font-bold text-navy-300 uppercase tracking-widest">Second Contact</p>
-              <DetailRow label="Name" value={client.second_contact_name} />
-              <DetailRow label="Email" value={client.second_contact_email} />
-              <DetailRow label="Phone" value={client.second_contact_phone} />
             </div>
           )}
 

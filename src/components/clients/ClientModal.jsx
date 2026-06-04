@@ -142,6 +142,26 @@ export default function ClientModal({ client = null, onClose, onSaved }) {
               </Field>
             </div>
 
+            <SectionHeading>Second Contact</SectionHeading>
+
+            <Field label="Name">
+              <input className="input" {...register('second_contact_name')} placeholder="Jane Smith" />
+            </Field>
+
+            <div className="grid grid-cols-2 gap-4">
+              <Field label="Email" error={errors.second_contact_email?.message}>
+                <input
+                  className={cn('input', errors.second_contact_email && 'border-red-400')}
+                  type="email"
+                  {...register('second_contact_email')}
+                  placeholder="jane@example.com"
+                />
+              </Field>
+              <Field label="Phone">
+                <input className="input" {...register('second_contact_phone')} placeholder="(555) 000-0002" />
+              </Field>
+            </div>
+
             <SectionHeading>Address</SectionHeading>
 
             <Field label="Street Address">
@@ -170,26 +190,6 @@ export default function ClientModal({ client = null, onClose, onSaved }) {
               </Field>
               <Field label="Phone">
                 <input className="input" {...register('emergency_contact_phone')} placeholder="(555) 000-0001" />
-              </Field>
-            </div>
-
-            <SectionHeading>Second Contact</SectionHeading>
-
-            <Field label="Name">
-              <input className="input" {...register('second_contact_name')} placeholder="Jane Smith" />
-            </Field>
-
-            <div className="grid grid-cols-2 gap-4">
-              <Field label="Email" error={errors.second_contact_email?.message}>
-                <input
-                  className={cn('input', errors.second_contact_email && 'border-red-400')}
-                  type="email"
-                  {...register('second_contact_email')}
-                  placeholder="jane@example.com"
-                />
-              </Field>
-              <Field label="Phone">
-                <input className="input" {...register('second_contact_phone')} placeholder="(555) 000-0002" />
               </Field>
             </div>
 
