@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { PawPrint, Plus, Search, ChevronRight, Pencil, Trash2, X } from 'lucide-react'
+import { PawPrint, Plus, Search, ChevronRight, Pencil, Trash2, X, ZoomIn } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { petAge, formatDate } from '@/lib/utils'
@@ -7,6 +7,31 @@ import { cn } from '@/lib/utils'
 import PetModal from '@/components/pets/PetModal'
 
 const SPECIES_EMOJI = { Dog: '🐕', Cat: '🐈', Bird: '🐦', Rabbit: '🐇', 'Guinea Pig': '🐹', Reptile: '🦎', Other: '🐾' }
+
+function PhotoLightbox({ url, name, onClose }) {
+  useEffect(() => {
+    const handler = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+  }, [onClose])
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <button className="absolute top-4 right-4 text-white btn-ghost p-2 rounded-full" onClick={onClose}>
+        <X className="w-6 h-6" />
+      </button>
+      <img
+        src={url}
+        alt={name}
+        className="max-w-full max-h-full rounded-2xl object-contain shadow-2xl"
+        onClick={e => e.stopPropagation()}
+      />
+    </div>
+  )
+}
 
 function PetAvatar({ pet, size = 'md' }) {
   const emoji = SPECIES_EMOJI[pet.species] ?? '🐾'
@@ -68,6 +93,7 @@ function DetailRow({ label, value }) {
 function PetDrawer({ pet, onClose, onEdit, onDeleted }) {
   const [deleting, setDeleting] = useState(false)
   const [vaccines, setVaccines] = useState([])
+  const [lightbox, setLightbox] = useState(false)
 
   useEffect(() => {
     supabase
@@ -105,6 +131,27 @@ function PetDrawer({ pet, onClose, onEdit, onDeleted }) {
         </div>
 
         <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+
+          {/* Photo */}
+          {pet.photo_url && (
+            <div>
+              <button
+                type="button"
+                onClick={() => setLightbox(true)}
+                className="relative group w-full rounded-2xl overflow-hidden border border-surface-border"
+              >
+                <img
+                  src={pet.photo_url}
+                  alt={pet.name}
+                  className="w-full h-48 object-cover"
+                />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 group-active:bg-black/30 transition-colors flex items-center justify-center">
+                  <ZoomIn className="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow" />
+                </div>
+              </button>
+            </div>
+          )}
+
           <div className="space-y-3">
             <p className="text-xs font-bold text-navy-300 uppercase tracking-widest">Profile</p>
             <DetailRow label="Species" value={pet.species} />
@@ -160,6 +207,10 @@ function PetDrawer({ pet, onClose, onEdit, onDeleted }) {
         </div>
       </div>
     </div>
+
+    {lightbox && pet.photo_url && (
+      <PhotoLightbox url={pet.photo_url} name={pet.name} onClose={() => setLightbox(false)} />
+    )}
   )
 }
 
