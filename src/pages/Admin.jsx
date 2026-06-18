@@ -22,12 +22,10 @@ export default function Admin() {
 
   useEffect(() => {
     supabase
-      .from('admin_user_stats')
-      .select('*')
-      .order('created_at')
+      .rpc('get_admin_user_stats')
       .then(({ data, error }) => {
         if (error) setError(error.message)
-        else setUsers(data ?? [])
+        else setUsers((data ?? []).sort((a, b) => new Date(a.created_at) - new Date(b.created_at)))
         setLoading(false)
       })
   }, [])
