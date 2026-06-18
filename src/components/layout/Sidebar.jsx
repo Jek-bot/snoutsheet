@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard,
   Users,
@@ -7,9 +7,11 @@ import {
   CalendarRange,
   Syringe,
   Settings,
+  ShieldCheck,
   ChevronRight,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useAuth } from '@/context/AuthContext'
 
 const nav = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -21,6 +23,7 @@ const nav = [
 ]
 
 export default function Sidebar({ onNavigate }) {
+  const { isAdmin } = useAuth()
   return (
     <aside className="w-60 flex-shrink-0 flex flex-col bg-navy h-full">
       {/* Logo */}
@@ -62,8 +65,32 @@ export default function Sidebar({ onNavigate }) {
         ))}
       </nav>
 
-      {/* Settings at bottom */}
-      <div className="px-3 py-4 border-t border-white/10">
+      {/* Admin + Settings at bottom */}
+      <div className="px-3 py-4 border-t border-white/10 space-y-0.5">
+        {isAdmin && (
+          <NavLink
+            to="/admin"
+            onClick={onNavigate}
+            className={({ isActive }) =>
+              cn(
+                'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-150 group',
+                isActive
+                  ? 'bg-white/15 text-white'
+                  : 'text-white/60 hover:bg-white/8 hover:text-white'
+              )
+            }
+          >
+            {({ isActive }) => (
+              <>
+                <ShieldCheck
+                  className={cn('w-4.5 h-4.5 flex-shrink-0', isActive ? 'text-teal' : 'text-white/50 group-hover:text-white/80')}
+                  strokeWidth={isActive ? 2.5 : 2}
+                />
+                <span className="flex-1">Admin</span>
+              </>
+            )}
+          </NavLink>
+        )}
         <NavLink
           to="/settings"
           onClick={onNavigate}

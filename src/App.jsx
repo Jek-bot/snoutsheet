@@ -11,6 +11,7 @@ import Vaccines from '@/pages/Vaccines'
 import Settings from '@/pages/Settings'
 import GoogleCallback from '@/pages/GoogleCallback'
 import ClientPortal from '@/pages/ClientPortal'
+import Admin from '@/pages/Admin'
 
 function PendingScreen() {
   const { signOut, user } = useAuth()
@@ -78,6 +79,7 @@ export default function App() {
         <Route path="schedule" element={<Schedule />} />
         <Route path="vaccines" element={<Vaccines />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="admin" element={<Admin />} />
       </Route>
       <Route path="/auth/google/callback" element={<GoogleCallback />} />
       <Route path="/portal/:token" element={<ClientPortal />} />
