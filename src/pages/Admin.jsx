@@ -38,6 +38,12 @@ export default function Admin() {
     setUsers(prev => prev.map(x => x.id === u.id ? { ...x, approved: !x.approved } : x))
   }
 
+  async function denyUser(u) {
+    if (!confirm(`Deny and delete ${u.email}? This cannot be undone.`)) return
+    await supabase.rpc('delete_user', { user_id: u.id })
+    setUsers(prev => prev.filter(x => x.id !== u.id))
+  }
+
   const totals = users.reduce((acc, u) => ({
     clients:  acc.clients  + Number(u.client_count),
     pets:     acc.pets     + Number(u.pet_count),
@@ -121,16 +127,26 @@ export default function Admin() {
                   </td>
                   <td className="px-5 py-4">
                     {u.id !== user?.id && (
-                      <button
-                        onClick={() => toggleApproved(u)}
-                        className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${
-                          u.approved
-                            ? 'border-red-200 text-red-600 hover:bg-red-50'
-                            : 'border-teal/30 text-teal hover:bg-teal/5'
-                        }`}
-                      >
-                        {u.approved ? 'Revoke' : 'Approve'}
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => toggleApproved(u)}
+                          className={`text-xs font-semibold px-3 py-1.5 rounded-lg border transition-colors ${
+                            u.approved
+                              ? 'border-red-200 text-red-600 hover:bg-red-50'
+                              : 'border-teal/30 text-teal hover:bg-teal/5'
+                          }`}
+                        >
+                          {u.approved ? 'Revoke' : 'Approve'}
+                        </button>
+                        {!u.approved && (
+                          <button
+                            onClick={() => denyUser(u)}
+                            className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-red-200 text-red-600 hover:bg-red-50 transition-colors"
+                          >
+                            Deny
+                          </button>
+                        )}
+                      </div>
                     )}
                   </td>
                 </tr>
