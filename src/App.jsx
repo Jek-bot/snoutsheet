@@ -12,6 +12,7 @@ import Settings from '@/pages/Settings'
 import GoogleCallback from '@/pages/GoogleCallback'
 import ClientPortal from '@/pages/ClientPortal'
 import Admin from '@/pages/Admin'
+import ResetPassword from '@/pages/ResetPassword'
 
 function PendingScreen() {
   const { signOut, user } = useAuth()
@@ -82,6 +83,7 @@ export default function App() {
         <Route path="admin" element={<Admin />} />
       </Route>
       <Route path="/auth/google/callback" element={<GoogleCallback />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/portal/:token" element={<ClientPortal />} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

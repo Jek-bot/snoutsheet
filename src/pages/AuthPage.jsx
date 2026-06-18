@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
+import { supabase } from '@/lib/supabase'
 import { cn } from '@/lib/utils'
 
 export default function AuthPage() {
@@ -13,6 +14,19 @@ export default function AuthPage() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [loading, setLoading] = useState(false)
+  const [forgotSent, setForgotSent] = useState(false)
+
+  async function handleForgotPassword() {
+    if (!email) { setError('Enter your email address above first.'); return }
+    setLoading(true)
+    setError('')
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    })
+    setLoading(false)
+    if (error) setError(error.message)
+    else setForgotSent(true)
+  }
 
   function switchMode(m) {
     setMode(m)
@@ -174,6 +188,24 @@ export default function AuthPage() {
                     autoComplete="new-password"
                   />
                 </div>
+              )}
+
+              {mode === 'signin' && (
+                <div className="flex justify-end -mt-2">
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    className="text-xs text-navy-300 hover:text-teal transition-colors"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+              )}
+
+              {forgotSent && (
+                <p className="text-sm text-green-700 bg-green-50 rounded-xl px-4 py-3">
+                  Check your email — we sent a password reset link.
+                </p>
               )}
 
               {error && (
