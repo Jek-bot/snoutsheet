@@ -5,6 +5,9 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { formatDate, formatCurrency, daysUntil } from '@/lib/utils'
 import { cn } from '@/lib/utils'
+import OnboardingChecklist from '@/components/OnboardingChecklist'
+
+const ONBOARDING_KEY = 'snoutsheet_onboarding_dismissed'
 
 function StatCard({ icon: Icon, label, value, color, to }) {
   const card = (
@@ -77,6 +80,10 @@ export default function Dashboard() {
   const [upcomingBookings, setUpcomingBookings] = useState([])
   const [expiringVaccines, setExpiringVaccines] = useState([])
   const [loading, setLoading] = useState(true)
+  const [onboardingChecks, setOnboardingChecks] = useState(null)
+  const [onboardingDismissed, setOnboardingDismissed] = useState(
+    () => localStorage.getItem(ONBOARDING_KEY) === 'true'
+  )
 
   useEffect(() => {
     if (!user) return
@@ -91,6 +98,9 @@ export default function Dashboard() {
         { count: expiring },
         { data: bookings },
         { data: vaccines },
+        { count: services },
+        { data: settings },
+        { count: allBookings },
       ] = await Promise.all([
         supabase.from('clients').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
         supabase.from('pets').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
@@ -103,18 +113,46 @@ export default function Dashboard() {
           .gte('start_date', now).order('start_date').limit(5),
         supabase.from('vaccines').select('*, pets(name, clients(first_name,last_name))')
           .eq('user_id', user.id).lte('expiry_date', in30).order('expiry_date').limit(5),
+        supabase.from('services').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
+        supabase.from('settings').select('business_name, business_phone').eq('user_id', user.id).maybeSingle(),
+        supabase.from('bookings').select('*', { count: 'exact', head: true }).eq('user_id', user.id),
       ])
 
       setStats({ clients: clients ?? 0, pets: pets ?? 0, upcoming: upcoming ?? 0, expiring: expiring ?? 0 })
       setUpcomingBookings(bookings ?? [])
       setExpiringVaccines(vaccines ?? [])
+      setOnboardingChecks({
+        hasBusiness: !!(settings?.business_name && settings?.business_phone),
+        hasService:  (services ?? 0) > 0,
+        hasClient:   (clients ?? 0) > 0,
+        hasPet:      (pets ?? 0) > 0,
+        hasBooking:  (allBookings ?? 0) > 0,
+      })
       setLoading(false)
     }
     load()
   }, [user])
 
+  function dismissOnboarding() {
+    localStorage.setItem(ONBOARDING_KEY, 'true')
+    setOnboardingDismissed(true)
+  }
+
   return (
     <div className="max-w-6xl mx-auto space-y-4">
+      {/* Onboarding checklist */}
+      {!onboardingDismissed && onboardingChecks && (
+        <OnboardingChecklist checks={onboardingChecks} onDismiss={dismissOnboarding} />
+      )}
+      {onboardingDismissed && onboardingChecks && !Object.values(onboardingChecks).every(Boolean) && (
+        <button
+          onClick={() => setOnboardingDismissed(false)}
+          className="text-xs text-teal font-semibold hover:underline"
+        >
+          📋 Resume setup guide
+        </button>
+      )}
+
       {/* Stats */}
       <div className="grid grid-cols-2 gap-3">
         <StatCard icon={Users} label="Total Clients" value={stats.clients} color="bg-navy-50 text-navy" to="/clients" />
