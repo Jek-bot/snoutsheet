@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { cn } from '@/lib/utils'
 import { isHeic, prepareImageForUpload } from '@/lib/image'
+import { reportError } from '@/lib/sentry'
 
 export default function PetPhotoUpload({ petId, currentUrl, onUploaded }) {
   const { user } = useAuth()
@@ -33,7 +34,7 @@ export default function PetPhotoUpload({ petId, currentUrl, onUploaded }) {
     try {
       jpeg = await prepareImageForUpload(file)
     } catch (err) {
-      console.error('Image processing failed:', err)
+      reportError(err, { label: 'Image processing failed', fileName: file.name, fileType: file.type })
       setError('Could not process this image. Please try a different photo.')
       setUploading(false)
       return
@@ -50,7 +51,7 @@ export default function PetPhotoUpload({ petId, currentUrl, onUploaded }) {
       .upload(path, jpeg, { upsert: true, contentType: 'image/jpeg' })
 
     if (uploadError) {
-      console.error('Pet photo upload failed:', uploadError)
+      reportError(uploadError, { label: 'Pet photo upload failed', path })
       setError('Upload failed. Please try again.')
       setPreview(currentUrl ?? null)
       setUploading(false)
