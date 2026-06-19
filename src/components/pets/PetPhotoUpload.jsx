@@ -3,6 +3,7 @@ import { Camera, Upload, X, Loader2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { cn } from '@/lib/utils'
+import { isHeic, prepareImageForUpload } from '@/lib/image'
 
 export default function PetPhotoUpload({ petId, currentUrl, onUploaded }) {
   const { user } = useAuth()
@@ -14,30 +15,42 @@ export default function PetPhotoUpload({ petId, currentUrl, onUploaded }) {
 
   async function handleFile(file) {
     if (!file) return
-    if (!file.type.startsWith('image/')) {
+    if (!file.type.startsWith('image/') && !isHeic(file)) {
       setError('Please select an image file.')
       return
     }
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Image must be under 5MB.')
+    // Generous original-size cap; the image is downscaled before upload.
+    if (file.size > 25 * 1024 * 1024) {
+      setError('Image must be under 25MB.')
       return
     }
 
     setError('')
     setUploading(true)
 
-    // Show local preview immediately
-    const localUrl = URL.createObjectURL(file)
+    // Convert HEIC and downscale/re-encode to a bounded JPEG before upload.
+    let jpeg
+    try {
+      jpeg = await prepareImageForUpload(file)
+    } catch (err) {
+      console.error('Image processing failed:', err)
+      setError('Could not process this image. Please try a different photo.')
+      setUploading(false)
+      return
+    }
+
+    // Show local preview from the processed image
+    const localUrl = URL.createObjectURL(jpeg)
     setPreview(localUrl)
 
-    const ext = file.name.split('.').pop()
-    const path = `${user.id}/${petId ?? 'new'}-${Date.now()}.${ext}`
+    const path = `${user.id}/${petId ?? 'new'}-${Date.now()}.jpg`
 
     const { error: uploadError } = await supabase.storage
       .from('pet-photos')
-      .upload(path, file, { upsert: true })
+      .upload(path, jpeg, { upsert: true, contentType: 'image/jpeg' })
 
     if (uploadError) {
+      console.error('Pet photo upload failed:', uploadError)
       setError('Upload failed. Please try again.')
       setPreview(currentUrl ?? null)
       setUploading(false)
@@ -107,7 +120,7 @@ export default function PetPhotoUpload({ petId, currentUrl, onUploaded }) {
       <input
         ref={fileRef}
         type="file"
-        accept="image/*"
+        accept="image/*,.heic,.heif"
         className="hidden"
         onChange={e => handleFile(e.target.files?.[0])}
       />
