@@ -79,6 +79,9 @@ export default function AuthPage() {
             <p className="text-white/60 text-lg leading-relaxed max-w-sm">
               Track clients, pets, bookings, vaccines, and your schedule — all in one warm, professional workspace built for independent pet sitters.
             </p>
+            <p className="text-white/60 text-lg leading-relaxed max-w-sm mt-4">
+              Sync your bookings straight to Google Calendar, so your appointments are always with you.
+            </p>
           </div>
 
           {/* Stats */}
