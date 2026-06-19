@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Eye, EyeOff } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { supabase } from '@/lib/supabase'
@@ -228,6 +229,11 @@ export default function AuthPage() {
 
           <p className="text-center text-sm text-navy-300 mt-5">
             Each account has its own private client and booking data.
+          </p>
+          <p className="text-center text-sm text-navy-300 mt-3">
+            <Link to="/privacy" className="hover:text-teal transition-colors">
+              Privacy Policy
+            </Link>
           </p>
         </div>
       </div>
