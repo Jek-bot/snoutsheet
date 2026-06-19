@@ -113,6 +113,13 @@ export default function Sidebar({ onNavigate }) {
             </>
           )}
         </NavLink>
+        <NavLink
+          to="/privacy"
+          onClick={onNavigate}
+          className="block px-3 pt-3 text-xs text-white/40 hover:text-white/70 transition-colors"
+        >
+          Privacy Policy
+        </NavLink>
       </div>
     </aside>
   )
