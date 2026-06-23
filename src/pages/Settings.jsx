@@ -7,7 +7,7 @@ import { useAuth } from '@/context/AuthContext'
 import { formatCurrency, formatDate } from '@/lib/utils'
 import { cn } from '@/lib/utils'
 import ServiceModal from '@/components/services/ServiceModal'
-import { buildGoogleAuthUrl } from '@/lib/calendarSync'
+import { buildGoogleAuthUrl, disconnectGoogleCalendar } from '@/lib/calendarSync'
 
 function Section({ title, children, action }) {
   return (
@@ -314,12 +314,12 @@ export default function Settings() {
               <button
                 onClick={async () => {
                   if (!confirm('Disconnect Google Calendar? Existing calendar events won\'t be deleted.')) return
-                  await supabase.from('settings').update({
-                    gcal_connected: false,
-                    gcal_calendar_id: null,
-                    gcal_refresh_token: null,
-                  }).eq('user_id', user.id)
-                  setForm(f => ({ ...f, gcal_connected: false, gcal_calendar_id: null }))
+                  try {
+                    await disconnectGoogleCalendar(user.id)
+                    setForm(f => ({ ...f, gcal_connected: false, gcal_calendar_id: null }))
+                  } catch (err) {
+                    alert('Could not disconnect: ' + (err?.message ?? 'unknown error'))
+                  }
                 }}
                 className="btn-outline text-red-600 border-red-200 hover:bg-red-50 text-xs px-3 py-1.5"
               >

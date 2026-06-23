@@ -14,6 +14,14 @@ export async function syncBookingToCalendar(bookingId, userId, action = 'upsert'
   }
 }
 
+export async function disconnectGoogleCalendar(userId) {
+  const { data, error } = await supabase.functions.invoke('google-disconnect', {
+    body: { user_id: userId },
+  })
+  if (error) throw error
+  return data
+}
+
 const EDGE_FUNCTION_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/google-auth`
 
 export function buildGoogleAuthUrl(userId) {
