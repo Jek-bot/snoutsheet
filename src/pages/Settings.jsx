@@ -147,7 +147,7 @@ export default function Settings() {
 
   async function save() {
     setSaving(true)
-    await supabase.from('settings').upsert({ ...form, user_id: user.id })
+    await supabase.from('settings').upsert({ ...form, user_id: user.id }, { onConflict: 'user_id' })
     setSaving(false)
     setSaved(true)
     setTimeout(() => setSaved(false), 2500)

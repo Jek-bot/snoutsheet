@@ -43,16 +43,24 @@ serve(async (req) => {
     })
     const cal = await calRes.json()
 
-    // Store tokens in settings
+    // Store tokens in settings.
+    // Conflict target must be user_id (the unique column), not the default
+    // primary key (id) — otherwise the upsert tries a plain INSERT and trips
+    // the user_id unique constraint for users who already have a settings row.
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY)
-    await supabase
+    const { error: upsertError } = await supabase
       .from('settings')
       .upsert({
         user_id: state,
         gcal_connected: true,
         gcal_calendar_id: cal.id ?? 'primary',
         gcal_refresh_token: tokens.refresh_token,
-      })
+      }, { onConflict: 'user_id' })
+
+    if (upsertError) {
+      console.error('google-auth settings upsert error:', upsertError)
+      return Response.redirect(`${APP_URL}/settings?gcal_error=save_failed`)
+    }
 
     return Response.redirect(`${APP_URL}/settings?gcal_success=1`)
   } catch (err) {
