@@ -21,7 +21,8 @@ serve(async (req) => {
       body: JSON.stringify({
         from: 'Snoutsheet <noreply@mail.jameskashork.com>',
         to: ADMIN_EMAIL,
-        subject: '🐾 New Snoutsheet sign-up pending approval',
+        subject: 'New Snoutsheet sign-up pending approval',
+        text: `A new account is waiting for your approval: ${email}\n\nReview in the admin dashboard: ${APP_URL}/admin`,
         html: `
           <div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">
             <h2 style="color: #0f2044;">New user signed up</h2>

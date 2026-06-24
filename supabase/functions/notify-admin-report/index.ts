@@ -54,6 +54,25 @@ serve(async (req) => {
       </div>
     `
 
+    // Plain-text alternative — HTML-only email is a notable spam signal.
+    const text = [
+      `New support report`,
+      `Category: ${t.category}${t.severity ? ` (${t.severity})` : ''}`,
+      ``,
+      `Subject: ${t.subject}`,
+      ``,
+      t.message,
+      t.expected ? `\nExpected:\n${t.expected}` : ``,
+      t.error_text ? `\nError:\n${t.error_text}` : ``,
+      ``,
+      `From: ${t.user_email ?? ''}`,
+      t.page_url ? `Page: ${t.page_url}` : ``,
+      meta.sentry_event_id ? `Sentry ID: ${meta.sentry_event_id}` : ``,
+      meta.submitted_at ? `Submitted: ${meta.submitted_at}` : ``,
+      ``,
+      `Open the admin dashboard: ${APP_URL}/admin`,
+    ].join('\n')
+
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -64,8 +83,9 @@ serve(async (req) => {
         from: 'Snoutsheet <noreply@mail.jameskashork.com>',
         to: ADMIN_EMAIL,
         reply_to: t.user_email || undefined,
-        subject: `🐾 Support: ${t.subject ?? 'New report'}`,
+        subject: `Support report: ${t.subject ?? 'New report'}`,
         html,
+        text,
       }),
     })
 
