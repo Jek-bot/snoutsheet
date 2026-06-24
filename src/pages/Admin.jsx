@@ -3,6 +3,7 @@ import { ShieldCheck, Users, PawPrint, CalendarDays, Syringe, Briefcase } from '
 import { supabase } from '@/lib/supabase'
 import { useAuth } from '@/context/AuthContext'
 import { formatDate } from '@/lib/utils'
+import SupportInbox from '@/components/admin/SupportInbox'
 
 function StatBadge({ icon: Icon, value, label }) {
   return (
@@ -155,6 +156,8 @@ export default function Admin() {
           </table>
         </div>
       )}
+
+      <SupportInbox />
     </div>
   )
 }

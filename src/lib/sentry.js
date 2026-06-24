@@ -28,6 +28,12 @@ export function setSentryUser(user) {
   Sentry.setUser(user ? { id: user.id, email: user.email } : null)
 }
 
+/** The id of the most recent Sentry event, or null. Attached to support tickets
+ *  so an admin can jump straight to the stack trace + session replay. */
+export function lastSentryEventId() {
+  return sentryEnabled ? (Sentry.lastEventId() ?? null) : null
+}
+
 /** Report a handled error: always logs to the console, and to Sentry if enabled. */
 export function reportError(error, extra) {
   console.error(extra?.label ?? 'Error:', error)

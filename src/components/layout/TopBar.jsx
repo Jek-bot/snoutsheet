@@ -1,6 +1,7 @@
 import { useLocation } from 'react-router-dom'
-import { Bell, LogOut, Menu } from 'lucide-react'
+import { LifeBuoy, LogOut, Menu } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
+import { useSupport } from '@/context/SupportContext'
 import { initials } from '@/lib/utils'
 
 const PAGE_TITLES = {
@@ -16,6 +17,7 @@ const PAGE_TITLES = {
 export default function TopBar({ onMenuClick }) {
   const { pathname } = useLocation()
   const { user, signOut } = useAuth()
+  const { openReport } = useSupport()
 
   const title = PAGE_TITLES[pathname] ?? 'Snoutsheet'
   const email = user?.email ?? ''
@@ -36,8 +38,13 @@ export default function TopBar({ onMenuClick }) {
       </div>
 
       <div className="flex items-center gap-1">
-        <button className="btn-ghost p-2 rounded-lg relative" aria-label="Notifications">
-          <Bell className="w-4.5 h-4.5" />
+        <button
+          onClick={openReport}
+          className="btn-ghost p-2 rounded-lg relative"
+          aria-label="Report a problem"
+          title="Report a problem"
+        >
+          <LifeBuoy className="w-4.5 h-4.5" />
         </button>
 
         <div className="flex items-center gap-2 ml-1">

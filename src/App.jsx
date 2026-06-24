@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from '@/context/AuthContext'
+import { SupportProvider } from '@/context/SupportContext'
 import AppLayout from '@/components/layout/AppLayout'
 import AuthPage from '@/pages/AuthPage'
 import Dashboard from '@/pages/Dashboard'
@@ -70,7 +71,9 @@ export default function App() {
         path="/"
         element={
           <RequireAuth>
-            <AppLayout />
+            <SupportProvider>
+              <AppLayout />
+            </SupportProvider>
           </RequireAuth>
         }
       >

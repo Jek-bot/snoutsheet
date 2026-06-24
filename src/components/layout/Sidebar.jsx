@@ -9,9 +9,11 @@ import {
   Settings,
   ShieldCheck,
   ChevronRight,
+  LifeBuoy,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useAuth } from '@/context/AuthContext'
+import { useSupport } from '@/context/SupportContext'
 
 const nav = [
   { to: '/', label: 'Dashboard', icon: LayoutDashboard, end: true },
@@ -24,6 +26,7 @@ const nav = [
 
 export default function Sidebar({ onNavigate }) {
   const { isAdmin } = useAuth()
+  const { openReport } = useSupport()
   return (
     <aside className="w-60 flex-shrink-0 flex flex-col bg-navy h-full">
       {/* Logo */}
@@ -113,6 +116,12 @@ export default function Sidebar({ onNavigate }) {
             </>
           )}
         </NavLink>
+        <button
+          onClick={() => { openReport(); onNavigate?.() }}
+          className="flex items-center gap-2 w-full px-3 pt-3 text-xs text-white/40 hover:text-white/70 transition-colors"
+        >
+          <LifeBuoy className="w-3.5 h-3.5" /> Report a problem
+        </button>
         <NavLink
           to="/privacy"
           onClick={onNavigate}
